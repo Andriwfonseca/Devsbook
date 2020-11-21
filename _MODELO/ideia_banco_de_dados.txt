@@ -1,0 +1,35 @@
+- Users
+-- id
+-- email
+-- password
+-- name
+-- birthdate (data de nascimento)
+-- city
+-- work (onde trabalha)
+-- avatar (foto do avatar)
+-- cover (capa do perfil)
+-- token (salvar no banco sessao do usuario, de login)
+
+- UserRelations (relação dos usuarios)
+-- id
+-- user_from (usuario que esta fazendo a ação)
+-- user_to (usuario que vai receber a ação)
+
+- Posts
+-- id
+-- type (text,photo)
+-- created_at (data criação do post)
+-- body (conteudo do post)
+
+- PostComments
+-- id
+-- id_post
+-- id_user
+-- created_at
+-- body
+
+- PostLikes
+-- id
+-- id_post
+-- id_user
+-- created_at
