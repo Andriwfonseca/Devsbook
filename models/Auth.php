@@ -6,10 +6,12 @@ e pertence a algum usuario*/
 class Auth{
     private $pdo;
     private $base;
+    private $dao;
 
     public function __construct(PDO $pdo, $base){
         $this->pdo = $pdo;
         $this->base = $base;
+        $this->dao = new UserDaoMySql($this->pdo);
     }
     public function checkToken(){
         //verifica se tem uma sessao com nome token, e se ela nao esta vazia
@@ -18,8 +20,7 @@ class Auth{
             $token = $_SESSION['token'];
             //ai manda essa sessao para o dao, para verificar no banco de dados se existe esse token
             //se existir ele retorna o usuario com esse token
-            $userDao = new UserDaoMysql($this->pdo);
-            $user = $userDao->findByToken($token);
+            $user = $this->dao->findByToken($token);
             //se existir esse token, ele retorna o usuario, caso contrario vai pra pagina de login
             if($user){
                 return $user;
@@ -32,10 +33,8 @@ class Auth{
        
     }
     public function validateLogin($email,$password){
-        
-        $userDao = new UserDaoMysql($this->pdo);
         //verifica se existe esse email
-        $user = $userDao->findByEmail($email);
+        $user = $this->dao->findByEmail($email);
         if($user){
             
             if(password_verify($password, $user->password)){
@@ -44,7 +43,7 @@ class Auth{
 
                 $_SESSION['token'] = $token;
                 $user->token = $token;
-                $userDao->update($user);
+                $this->dao->update($user);
 
                 return true;
             }
@@ -52,14 +51,10 @@ class Auth{
 
         return false;
     }
-    public function emailExists($email){
-        $userDao = new UserDaoMysql($this->pdo);
-        
-        return $userDao->findByEmail($email) ? true : false;
+    public function emailExists($email){        
+        return $this->dao->findByEmail($email) ? true : false;
     }
     public function registerUser($name,$email,$password,$birthdate){
-        $userDao = new UserDaoMysql($this->pdo);
-
         $hash = password_hash($password, PASSWORD_DEFAULT);
         $token = md5(time().rand(0,9999));
 
@@ -70,7 +65,7 @@ class Auth{
         $newUser->birthdate = $birthdate;
         $newUser->token = $token;
 
-        $userDao->insert($newUser);
+        $this->dao->insert($newUser);
 
         $_SESSION['token'] = $token;
     }
